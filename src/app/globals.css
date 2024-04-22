@@ -12,3 +12,24 @@
 
 body {
 }
+
+.color-picker .react-colorful {
+  padding: 16px;
+  border-radius: 12px;
+  background: rgb(31 41 55);
+  .react-colorful__saturation-pointer {
+    width: 16px;
+    height: 16px;
+  }
+  .react-colorful__hue-pointer {
+    width: 10px;
+    border-radius: 3px;
+  }
+}
+
+@media screen and (max-width: 430px) {
+  .color-picker .react-colorful {
+    width: 10em;
+    height: 10em;
+  }
+}
