@@ -2,20 +2,16 @@
 
 import {Box, Button, Text} from 'usual-ui';
 import {ChangeEvent, useEffect, useState} from 'react';
-import {Comfortaa} from '@next/font/google';
 import {fabric} from 'fabric';
 import { HexColorPicker } from 'react-colorful';
-
-const comfortaa = Comfortaa({
-	subsets: ['latin'],
-	weight: ['700']
-});
+import {FontMenu} from '@/app/components/FontMenu';
 
 const ImageEditor = () => {
 	const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
 	const [isImageUploaded, setIsImageUploaded] = useState(false);
 	const [scaleFactor, setScaleFactor] = useState(1);
 	const [selectedTextColor, setSelectedTextColor] = useState('#ffffff');
+	const [selectedFont, setSelectedFont] = useState('Impact');
 
 	const img = new Image();
 
@@ -30,6 +26,21 @@ const ImageEditor = () => {
 			setScaleFactor(Math.min(maxWidth / img.width, maxHeight / img.height, 0.9));
 		}
 	}, [img.height, img.width]);
+
+	useEffect(() => {
+		if (!canvas) {
+			return;
+		}
+
+		canvas.forEachObject((object) => {
+			if (object.type === 'textbox') {
+				// @ts-ignore
+				object.set('fontFamily', selectedFont);
+			}
+		});
+
+		canvas.renderAll();
+	}, [selectedFont])
 
 	useEffect(() => {
 		if (!canvas) return;
@@ -60,29 +71,20 @@ const ImageEditor = () => {
 				fabricCanvas.setBackgroundImage(fabricImg, fabricCanvas.renderAll.bind(fabricCanvas));
 				setCanvas(fabricCanvas);
 			};
-			img.src = event.target!.result as string; // Убедитесь, что Img и Img.src не равны null
+			img.src = event.target!.result as string;
 		};
 		reader.readAsDataURL(file);
 	};
-
-	// const changeFont = () => {
-	// 	if (!canvas) return;
-	// 	const activeObject = canvas.getActiveObject() as fabric.Textbox; // Уточнение типа
-	// 	if (activeObject && activeObject.type === 'textbox') {
-	// 		activeObject.set('fontFamily', 'Impact');
-	// 		canvas.renderAll();
-	// 	}
-	// };
 
 	const addText = () => {
 		const text = new fabric.Textbox('Your text here', {
 			top: 100,
 			left: 100,
-			fontSize: 20,
+			fontSize: 40,
 			selectable: true,
-			fontFamily: 'Impact',
+			fontFamily: selectedFont,
 			stroke: 'black',
-			strokeWidth: 1,
+			strokeWidth: 0,
 			fill: selectedTextColor
 		});
 
@@ -121,7 +123,7 @@ const ImageEditor = () => {
 
 	let div = <>
 		<div className={`${isImageUploaded ? 'gap-[4vh]' : 'gap-[15vh]'} mx-auto p-3 flex flex-col justify-center `}>
-			<div className={`${comfortaa.className} text-center mt-3 md:mt-[2.5em]`}>
+			<div className={`text-center mt-3 md:mt-[2.5em]`}>
 				<Text className={'mx-auto text-4xl text-gray-900 md:text-5xl'}>add - some - text</Text>
 			</div>
 			<div className="h-auto overflow-hidden w-full md:w-full text-center flex justify-center items-center">
@@ -132,10 +134,10 @@ const ImageEditor = () => {
 									className="w-full h-full text-center rounded-lg drop-shadow-lg shadow-xl hover:drop-shadow-2xl hover:shadow-2xl transition"></canvas>
 						</div>
 						<div
-							className={`${comfortaa.className} text-sm mt-3 md:text-md flex flex-row md:flex-row gap-[15vw]`}>
+							className={`text-sm mt-3 md:text-md flex flex-row md:flex-row gap-[15vw]`}>
 							<div className={'flex flex-col gap-0.5'}>
 								<Button variant="underline"
-										className={'text-gray-900 w-auto mr-[0.6vw] align-left flex hover:text-gray-800'}
+										className={'text-gray-900 p-1 w-auto align-left flex hover:text-gray-800'}
 										onClick={addText}>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
 										 className="w-5 h-5 mr-0.5">
@@ -145,17 +147,15 @@ const ImageEditor = () => {
 									</svg>
 									Add Text</Button>
 								<Button variant="underline"
-										className={'text-gray-900 w-auto mr-[0.6vw] align-left flex hover:text-gray-800'}
+										className={'text-gray-900 p-1 w-auto align-left flex hover:text-gray-800'}
 										onClick={handleImageChange}>
 									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
 										 strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-0.5">
 										<path strokeLinecap="round" strokeLinejoin="round"
 											  d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"/>
-									</svg>
-
-									Change Image</Button>
+									</svg>Change Image</Button>
 								<Button variant="underline"
-										className={'text-gray-900 w-auto align-left hover:text-gray-800 flex'}
+										className={'text-gray-900 p-1 w-auto align-left hover:text-gray-800 flex'}
 										onClick={deleteSelectedObject}>
 									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
 										 strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-0.5">
@@ -167,7 +167,7 @@ const ImageEditor = () => {
 							</div>
 							<div className={'flex flex-col'}>
 								<Button variant="underline"
-										className={'text-gray-900 w-auto align-right hover:text-gray-800 flex mb-[1.3vh]'}
+										className={'text-gray-900 p-1 w-auto align-right hover:text-gray-800 flex'}
 										onClick={saveImage}>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
 										 className="w-5 h-5 mr-0.5">
@@ -176,17 +176,18 @@ const ImageEditor = () => {
 											  clipRule="evenodd"/>
 									</svg>
 									Save Image</Button>
+								<FontMenu selectedFont={selectedFont} setSelectedFont={setSelectedFont}/>
 							</div>
 						</div>
 						<div className={'text-gray-900 w-auto flex-col flex color-picker mt-1'}>
-							<Text className={'text-gray-900 mb-2'}>Text Color:</Text>
+							<Text className={'text-gray-900 mb-2 text-center'}>Text Color:</Text>
 							<HexColorPicker color={selectedTextColor} onChange={(color) => setSelectedTextColor(color)} />
 						</div>
 					</div>
 				) : (
 					<Box
 						className="border-2 rounded-xl w-[30em] border-dashed min-h-[25vh] md:min-h-[15em] border-gray-800 items-center text-center align-middle flex justify-center">
-						<Text className={`${comfortaa.className} text-gray-800`}>Please, upload image...</Text>
+						<Text className={`text-gray-800 text-center`}>Please, upload image...</Text>
 					</Box>
 				)}
 			</div>
@@ -196,7 +197,7 @@ const ImageEditor = () => {
 						<label htmlFor="dropzone-file"
 							   className="p-5 flex flex-col w-full items-center justify-center border-2 border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:border-dashed dark:hover:bg-bray-800 dark:bg-gray-800 hover:bg-gray-100 dark:border-gray-800 dark:hover:border-gray-800 dark:hover:bg-gray-900 transition">
 							<div
-								className={`${comfortaa.className} flex flex-col items-center justify-center pt-5 pb-6`}>
+								className={`flex flex-col items-center justify-center pt-5 pb-6`}>
 								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
 									 strokeWidth={1.5} stroke="currentColor"
 									 className="w-8 h-8 text-gray-500 dark:text-gray-600 mb-2">
