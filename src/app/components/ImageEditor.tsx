@@ -1,9 +1,9 @@
 'use client';
 
-import {Box, Button, Text} from 'usual-ui';
+import {Box, Button, Input, Text} from 'usual-ui';
 import {ChangeEvent, useEffect, useState} from 'react';
 import {fabric} from 'fabric';
-import { HexColorPicker } from 'react-colorful';
+import {HexColorPicker} from 'react-colorful';
 import {FontMenu} from '@/app/components/FontMenu';
 
 const ImageEditor = () => {
@@ -12,6 +12,7 @@ const ImageEditor = () => {
 	const [scaleFactor, setScaleFactor] = useState(1);
 	const [selectedTextColor, setSelectedTextColor] = useState('#ffffff');
 	const [selectedFont, setSelectedFont] = useState('Impact');
+	const [strokeWidth, setStrokeWidth] = useState(0);
 
 	const img = new Image();
 
@@ -32,15 +33,32 @@ const ImageEditor = () => {
 			return;
 		}
 
+		const activeObject = canvas.getActiveObject() as fabric.Textbox;
+		if (activeObject && activeObject.type === 'textbox') {
+			// @ts-ignore
+			activeObject.set('strokeWidth', strokeWidth);
+			canvas.renderAll();
+		}
+	}, [strokeWidth]);
+
+	useEffect(() => {
+		if (!canvas) {
+			return;
+		}
+		const activeObject = canvas.getActiveObject() as fabric.Textbox;
 		canvas.forEachObject((object) => {
 			if (object.type === 'textbox') {
 				// @ts-ignore
 				object.set('fontFamily', selectedFont);
 			}
 		});
+		if (activeObject && activeObject.type === 'textbox') {
+			// @ts-ignore
+			activeObject.set('fontFamily', selectedFont);
+		}
 
 		canvas.renderAll();
-	}, [selectedFont])
+	}, [selectedFont]);
 
 	useEffect(() => {
 		if (!canvas) return;
@@ -50,7 +68,23 @@ const ImageEditor = () => {
 			activeObject.set('fill', selectedTextColor);
 			canvas.renderAll();
 		}
-	}, [selectedTextColor])
+	}, [selectedTextColor]);
+
+	const strokeIncrease = () => {
+		setStrokeWidth(strokeWidth + 1);
+	}
+	const strokeDecrease = () => {
+		strokeWidth ? setStrokeWidth(strokeWidth - 1) : setStrokeWidth(strokeWidth);
+	}
+
+	const changeStrokeWidth = (width: number) => {
+		if (!canvas) return;
+		const activeObject = canvas.getActiveObject() as fabric.Textbox;
+		if (activeObject && activeObject.type === 'textbox') {
+			activeObject.set('strokeWidth', width);
+			canvas.renderAll();
+		}
+	};
 
 	const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
 		setIsImageUploaded(false);
@@ -134,10 +168,10 @@ const ImageEditor = () => {
 									className="w-full h-full text-center rounded-lg drop-shadow-lg shadow-xl hover:drop-shadow-2xl hover:shadow-2xl transition"></canvas>
 						</div>
 						<div
-							className={`text-sm mt-3 md:text-md flex flex-row md:flex-row gap-[15vw]`}>
+							className={`text-sm mt-3 md:text-md flex flex-row md:flex-row gap-[17vw]`}>
 							<div className={'flex flex-col gap-0.5'}>
-								<Button variant="underline"
-										className={'text-gray-900 p-1 w-auto align-left flex hover:text-gray-800'}
+								<Button role="group" variant="underline"
+										className={'text-gray-900 py-0.5 px-0 w-auto align-left flex hover:text-gray-800'}
 										onClick={addText}>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
 										 className="w-5 h-5 mr-0.5">
@@ -146,16 +180,17 @@ const ImageEditor = () => {
 											  clipRule="evenodd"/>
 									</svg>
 									Add Text</Button>
-								<Button variant="underline"
-										className={'text-gray-900 p-1 w-auto align-left flex hover:text-gray-800'}
+								<Button role="group" variant="underline"
+										className={'text-gray-900 py-0.5 px-0 w-auto align-left flex hover:text-gray-800'}
 										onClick={handleImageChange}>
 									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
 										 strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-0.5">
 										<path strokeLinecap="round" strokeLinejoin="round"
 											  d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"/>
-									</svg>Change Image</Button>
-								<Button variant="underline"
-										className={'text-gray-900 p-1 w-auto align-left hover:text-gray-800 flex'}
+									</svg>
+									Change Image</Button>
+								<Button role="group" variant="underline"
+										className={'text-gray-900 py-0.5 px-0 w-auto align-left hover:text-gray-800 flex'}
 										onClick={deleteSelectedObject}>
 									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
 										 strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-0.5">
@@ -166,8 +201,29 @@ const ImageEditor = () => {
 									Clear Text</Button>
 							</div>
 							<div className={'flex flex-col'}>
+								<div
+									className="inline-flex rounded-md text-gray-900 align-middle justify-center items-center"
+									role="group">
+									<span className="text-sm text-center text-gray-900 mr-1">Stroke:</span>
+									<Button variant="underline" type="button" onClick={strokeIncrease}
+											className="text-gray-900 p-0.5 w-auto align-left hover:text-gray-800 flex">
+										<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+											 strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+											<path strokeLinecap="round" strokeLinejoin="round"
+												  d="m4.5 15.75 7.5-7.5 7.5 7.5"/>
+										</svg>
+									</Button>
+									<Button variant="underline" type="button" onClick={strokeDecrease}
+											className="text-gray-900 p-0.5 w-auto align-left hover:text-gray-800 flex">
+										<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+											 strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+											<path strokeLinecap="round" strokeLinejoin="round"
+												  d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+										</svg>
+									</Button>
+								</div>
 								<Button variant="underline"
-										className={'text-gray-900 p-1 w-auto align-right hover:text-gray-800 flex'}
+										className={'text-gray-900 py-0.5 px-0 w-auto align-right hover:text-gray-800 flex'}
 										onClick={saveImage}>
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
 										 className="w-5 h-5 mr-0.5">
@@ -180,8 +236,9 @@ const ImageEditor = () => {
 							</div>
 						</div>
 						<div className={'text-gray-900 w-auto flex-col flex color-picker mt-1'}>
-							<Text className={'text-gray-900 mb-2 text-center'}>Text Color:</Text>
-							<HexColorPicker color={selectedTextColor} onChange={(color) => setSelectedTextColor(color)} />
+							<Text className={'text-gray-900 py-0 text-center'}>Text Color:</Text>
+							<HexColorPicker color={selectedTextColor}
+											onChange={(color) => setSelectedTextColor(color)}/>
 						</div>
 					</div>
 				) : (
