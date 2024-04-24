@@ -83,19 +83,19 @@ const ImageEditor = () => {
 			return;
 		}
 		const activeObject = canvas.getActiveObject() as fabric.Textbox;
+		if (activeObject && activeObject.type === 'textbox') {
+			// @ts-ignore
+			activeObject.set('fontFamily', selectedFont);
+		}
 		canvas.forEachObject((object) => {
 			if (object.type === 'textbox') {
 				// @ts-ignore
 				object.set('fontFamily', selectedFont);
 			}
 		});
-		if (activeObject && activeObject.type === 'textbox') {
-			// @ts-ignore
-			activeObject.set('fontFamily', selectedFont);
-		}
 
 		canvas.renderAll();
-	}, [selectedFont]);
+	}, [selectedFont, isImageUploaded]);
 
 	useEffect(() => {
 		if (!canvas) return;
@@ -108,10 +108,10 @@ const ImageEditor = () => {
 	}, [selectedTextColor]);
 
 	const strokeIncrease = () => {
-		setStrokeWidth(strokeWidth + 1);
+		setStrokeWidth(strokeWidth + 0.5);
 	}
 	const strokeDecrease = () => {
-		strokeWidth ? setStrokeWidth(strokeWidth - 1) : setStrokeWidth(strokeWidth);
+		strokeWidth ? setStrokeWidth(strokeWidth - 0.5) : setStrokeWidth(strokeWidth);
 	}
 
 	const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
