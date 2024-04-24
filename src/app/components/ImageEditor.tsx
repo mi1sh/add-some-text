@@ -45,25 +45,23 @@ const ImageEditor = () => {
 
 		if (window.innerWidth <= 500) {
 			maxWidth = 350;
-			maxHeight = 350;
 		} else if (window.innerWidth <= 900) {
 			maxWidth = 600;
-			maxHeight = 400;
 		}
 
 		const scale = Math.min(maxWidth / img.width, maxHeight / img.height, scaleFactor);
 
 		const fabricCanvas = new fabric.Canvas('canvas', {
 			width: img.width * scale,
-			height: img.height * scale,
+			height: img.height * scale
 		});
 		const fabricImg = new fabric.Image(img, {
 			scaleX: scale,
-			scaleY: scale,
+			scaleY: scale
 		});
 		fabricCanvas.setBackgroundImage(fabricImg, fabricCanvas.renderAll.bind(fabricCanvas));
 		setCanvas(fabricCanvas);
-	}, [img]);
+	}, [img, scaleFactor]);
 
 	useEffect(() => {
 		if (!canvas) {
@@ -109,10 +107,10 @@ const ImageEditor = () => {
 
 	const strokeIncrease = () => {
 		setStrokeWidth(strokeWidth + 0.5);
-	}
+	};
 	const strokeDecrease = () => {
 		strokeWidth ? setStrokeWidth(strokeWidth - 0.5) : setStrokeWidth(strokeWidth);
-	}
+	};
 
 	const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
 		setIsImageUploaded(false);
@@ -123,8 +121,8 @@ const ImageEditor = () => {
 		reader.onload = (event) => {
 			setIsImageUploaded(true);
 			const image = new Image();
+			image.onload = () => setImg(image);
 			image.src = event.target!.result as string;
-			setImg(image);
 		};
 		reader.readAsDataURL(file);
 	};
@@ -164,7 +162,8 @@ const ImageEditor = () => {
 		if (!canvas) return;
 		const dataURL = canvas.toDataURL({
 			format: 'png',
-			quality: 1
+			quality: 1,
+			multiplier: 2
 		});
 		const a = document.createElement('a');
 		a.href = dataURL;
