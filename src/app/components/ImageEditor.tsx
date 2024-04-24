@@ -1,6 +1,6 @@
 'use client';
 
-import {Box, Button, Input, Text} from 'usual-ui';
+import {Box, Button, Text} from 'usual-ui';
 import {ChangeEvent, useEffect, useState} from 'react';
 import {fabric} from 'fabric';
 import {HexColorPicker} from 'react-colorful';

@@ -1,3 +1,5 @@
+'use client';
+
 import React, {Dispatch, SetStateAction} from 'react';
 import {Button} from 'usual-ui';
 import { Menu } from '@headlessui/react';
