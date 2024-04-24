@@ -16,35 +16,54 @@ const ImageEditor = () => {
 	const [img, setImg] = useState<HTMLImageElement | null>(null);
 
 	useEffect(() => {
-		if (!img) return;
-
-		img.onload = () => {
-			const fabricCanvas = new fabric.Canvas('canvas');
-			fabricCanvas.setWidth(img.width * scaleFactor);
-			fabricCanvas.setHeight(img.height * scaleFactor);
-			const fabricImg = new fabric.Image(img, {
-				scaleX: scaleFactor,
-				scaleY: scaleFactor
-			});
-			fabricCanvas.setBackgroundImage(fabricImg, fabricCanvas.renderAll.bind(fabricCanvas));
-			setCanvas(fabricCanvas);
+		const handleResize = () => {
+			if (window.innerWidth <= 430) {
+				setScaleFactor(0.6);
+			} else if (window.innerWidth <= 530) {
+				setScaleFactor(0.7);
+			} else if (window.innerWidth <= 900) {
+				setScaleFactor(0.9);
+			}
 		};
-	}, [img, scaleFactor]);
+
+		handleResize();
+
+		window.addEventListener('resize', handleResize);
+
+		return () => {
+			window.removeEventListener('resize', handleResize);
+		};
+	}, []);
 
 	useEffect(() => {
 		if (!img) {
 			return;
 		}
-		const maxWidth = 800;
-		const maxHeight = 400;
-		if (window.innerWidth <= 430) {
-			setScaleFactor(Math.min(maxWidth / img.width, maxHeight / img.height, 0.6));
-		} else if (window.innerWidth <= 530) {
-			setScaleFactor(Math.min(maxWidth / img.width, maxHeight / img.height, 0.7));
+
+		let maxWidth = 800;
+		let maxHeight = 400;
+
+		if (window.innerWidth <= 500) {
+			maxWidth = 350;
+			maxHeight = 350;
 		} else if (window.innerWidth <= 900) {
-			setScaleFactor(Math.min(maxWidth / img.width, maxHeight / img.height, 0.9));
+			maxWidth = 600;
+			maxHeight = 400;
 		}
-	}, [img?.height, img?.width]);
+
+		const scale = Math.min(maxWidth / img.width, maxHeight / img.height, scaleFactor);
+
+		const fabricCanvas = new fabric.Canvas('canvas', {
+			width: img.width * scale,
+			height: img.height * scale,
+		});
+		const fabricImg = new fabric.Image(img, {
+			scaleX: scale,
+			scaleY: scale,
+		});
+		fabricCanvas.setBackgroundImage(fabricImg, fabricCanvas.renderAll.bind(fabricCanvas));
+		setCanvas(fabricCanvas);
+	}, [img]);
 
 	useEffect(() => {
 		if (!canvas) {
