@@ -4,7 +4,7 @@ import {Box, Button, Text} from 'usual-ui';
 import {ChangeEvent, useEffect, useState} from 'react';
 import {fabric} from 'fabric';
 import {HexColorPicker} from 'react-colorful';
-import {FontMenu} from '@/app/components/FontMenu';
+import {FontMenu} from './FontMenu';
 
 const ImageEditor = () => {
 	const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
@@ -13,10 +13,28 @@ const ImageEditor = () => {
 	const [selectedTextColor, setSelectedTextColor] = useState('#ffffff');
 	const [selectedFont, setSelectedFont] = useState('Impact');
 	const [strokeWidth, setStrokeWidth] = useState(0);
-
-	const img = new Image();
+	const [img, setImg] = useState<HTMLImageElement | null>(null);
 
 	useEffect(() => {
+		if (!img) return;
+
+		img.onload = () => {
+			const fabricCanvas = new fabric.Canvas('canvas');
+			fabricCanvas.setWidth(img.width * scaleFactor);
+			fabricCanvas.setHeight(img.height * scaleFactor);
+			const fabricImg = new fabric.Image(img, {
+				scaleX: scaleFactor,
+				scaleY: scaleFactor
+			});
+			fabricCanvas.setBackgroundImage(fabricImg, fabricCanvas.renderAll.bind(fabricCanvas));
+			setCanvas(fabricCanvas);
+		};
+	}, [img, scaleFactor]);
+
+	useEffect(() => {
+		if (!img) {
+			return;
+		}
 		const maxWidth = 800;
 		const maxHeight = 400;
 		if (window.innerWidth <= 430) {
@@ -26,7 +44,7 @@ const ImageEditor = () => {
 		} else if (window.innerWidth <= 900) {
 			setScaleFactor(Math.min(maxWidth / img.width, maxHeight / img.height, 0.9));
 		}
-	}, [img.height, img.width]);
+	}, [img?.height, img?.width]);
 
 	useEffect(() => {
 		if (!canvas) {
@@ -77,15 +95,6 @@ const ImageEditor = () => {
 		strokeWidth ? setStrokeWidth(strokeWidth - 1) : setStrokeWidth(strokeWidth);
 	}
 
-	const changeStrokeWidth = (width: number) => {
-		if (!canvas) return;
-		const activeObject = canvas.getActiveObject() as fabric.Textbox;
-		if (activeObject && activeObject.type === 'textbox') {
-			activeObject.set('strokeWidth', width);
-			canvas.renderAll();
-		}
-	};
-
 	const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
 		setIsImageUploaded(false);
 		const file = e.target.files?.[0];
@@ -94,18 +103,9 @@ const ImageEditor = () => {
 		const reader = new FileReader();
 		reader.onload = (event) => {
 			setIsImageUploaded(true);
-			img.onload = () => {
-				const fabricCanvas = new fabric.Canvas('canvas');
-				fabricCanvas.setWidth(img.width * scaleFactor);
-				fabricCanvas.setHeight(img.height * scaleFactor);
-				const fabricImg = new fabric.Image(img, {
-					scaleX: scaleFactor,
-					scaleY: scaleFactor
-				});
-				fabricCanvas.setBackgroundImage(fabricImg, fabricCanvas.renderAll.bind(fabricCanvas));
-				setCanvas(fabricCanvas);
-			};
-			img.src = event.target!.result as string;
+			const image = new Image();
+			image.src = event.target!.result as string;
+			setImg(image);
 		};
 		reader.readAsDataURL(file);
 	};
