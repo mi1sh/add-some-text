@@ -1,12 +1,13 @@
-'use client';
-
 import React, {Dispatch, SetStateAction} from 'react';
 import {Button} from 'usual-ui';
 import { Menu } from '@headlessui/react';
+import {fabric} from 'fabric';
+import '../globals.css'
 
 type FontMenuProps = {
 	selectedFont: string;
-	setSelectedFont: Dispatch<SetStateAction<string>>
+	setSelectedFont: Dispatch<SetStateAction<string>>;
+	canvas: fabric.Canvas | null;
 }
 
 export const FontMenu = ({selectedFont, setSelectedFont}: FontMenuProps) => {

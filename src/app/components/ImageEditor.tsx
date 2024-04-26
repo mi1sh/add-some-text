@@ -5,6 +5,7 @@ import {ChangeEvent, useEffect, useState} from 'react';
 import {fabric} from 'fabric';
 import {HexColorPicker} from 'react-colorful';
 import {FontMenu} from './FontMenu';
+import '../globals.css';
 
 const ImageEditor = () => {
 	const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
@@ -14,6 +15,17 @@ const ImageEditor = () => {
 	const [selectedFont, setSelectedFont] = useState('Impact');
 	const [strokeWidth, setStrokeWidth] = useState(0);
 	const [img, setImg] = useState<HTMLImageElement | null>(null);
+	const [isCanvasInitialized, setIsCanvasInitialized] = useState(false);
+	const text = new fabric.Textbox('Your text here', {
+		top: 100,
+		left: 100,
+		fontSize: 40,
+		selectable: true,
+		fontFamily: selectedFont,
+		stroke: 'black',
+		strokeWidth: strokeWidth,
+		fill: selectedTextColor
+	});
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -61,6 +73,7 @@ const ImageEditor = () => {
 		});
 		fabricCanvas.setBackgroundImage(fabricImg, fabricCanvas.renderAll.bind(fabricCanvas));
 		setCanvas(fabricCanvas);
+		setIsCanvasInitialized(true);
 	}, [img, scaleFactor]);
 
 	useEffect(() => {
@@ -77,25 +90,6 @@ const ImageEditor = () => {
 	}, [strokeWidth]);
 
 	useEffect(() => {
-		if (!canvas) {
-			return;
-		}
-		const activeObject = canvas.getActiveObject() as fabric.Textbox;
-		if (activeObject && activeObject.type === 'textbox') {
-			// @ts-ignore
-			activeObject.set('fontFamily', selectedFont);
-		}
-		canvas.forEachObject((object) => {
-			if (object.type === 'textbox') {
-				// @ts-ignore
-				object.set('fontFamily', selectedFont);
-			}
-		});
-
-		canvas.renderAll();
-	}, [selectedFont, isImageUploaded]);
-
-	useEffect(() => {
 		if (!canvas) return;
 		const activeObject = canvas.getActiveObject() as fabric.Textbox;
 		if (activeObject && activeObject.type === 'textbox') {
@@ -104,6 +98,28 @@ const ImageEditor = () => {
 			canvas.renderAll();
 		}
 	}, [selectedTextColor]);
+
+	useEffect(() => {
+		changeFont(selectedFont);
+	}, [selectedFont, isCanvasInitialized]);
+
+	const changeFont = (font: string) => {
+		if (!canvas) {
+			console.error('Canvas is not initialized');
+			return;
+		}
+
+		console.log('Changing font to:', font);
+
+		canvas.forEachObject((object) => {
+			if (object.type === 'textbox') {
+				const activeObject = object as fabric.Textbox;
+				activeObject.set('fontFamily', font);
+			}
+		});
+
+		canvas.renderAll();
+	}
 
 	const strokeIncrease = () => {
 		setStrokeWidth(strokeWidth + 0.5);
@@ -128,19 +144,13 @@ const ImageEditor = () => {
 	};
 
 	const addText = () => {
-		const text = new fabric.Textbox('Your text here', {
-			top: 100,
-			left: 100,
-			fontSize: 40,
-			selectable: true,
-			fontFamily: selectedFont,
-			stroke: 'black',
-			strokeWidth: 0,
-			fill: selectedTextColor
-		});
-
 		if (!canvas) return;
-		canvas.add(text);
+		try {
+			canvas.add(text);
+		} catch {
+			console.error('Error adding text')
+		}
+		canvas.renderAll();
 	};
 
 	const deleteSelectedObject = () => {
@@ -250,7 +260,7 @@ const ImageEditor = () => {
 											  clipRule="evenodd"/>
 									</svg>
 									Save Image</Button>
-								<FontMenu selectedFont={selectedFont} setSelectedFont={setSelectedFont}/>
+								<FontMenu canvas={canvas} selectedFont={selectedFont} setSelectedFont={setSelectedFont}/>
 							</div>
 						</div>
 						<div className={'text-gray-900 w-auto flex-col flex color-picker mt-1'}>
