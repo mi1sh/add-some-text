@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+<div align='center'>
+<h1><b>Add-Some-Text <img src='https://github.com/mi1sh/add-some-text/assets/106558234/23339169-98c9-4999-8997-36ffdc8f9b26' width='60' height='60'></b></h1>
 
-## Getting Started
+[![TRY](https://img.shields.io/badge/CLICK%20TO%20TRY-3D4652)](https://add-some-text.vercel.app/)
+[![LICENSE](https://img.shields.io/github/license/mi1sh/add-some-text?color=3D4652)](https://github.com/mi1sh/add-some-text/blob/main/LICENSE)
+</div>
 
-First, run the development server:
+## **❔How to use**
+
+Welcome to **add-some-text**, a web application that allows users to enhance their photos by adding customizable text. With a variety of options to choose from, including text color, stroke thickness, font, and text size, users can personalize their images to create memes or something else.
+
+<div align='center'>
+  
+![add-some-text-example](https://github.com/mi1sh/add-some-text/assets/106558234/8ffb2932-594c-4bff-a752-87fbe57cdbea)
+</div>
+
+## **🛠️Built With**
+
+- [Next.js](https://nextjs.org/) - A React framework for building JavaScript applications.
+- [Usual UI](https://usual-ui.com/) - My own simple component library :3 you can find it in my profile.
+- [twallpaper](https://twallpaper.com/) - A tool for creating gradient wallpaper.
+- [Tailwind CSS](https://tailwindcss.com/) - A utility-first CSS framework for rapidly building custom designs.
+- [Headless UI](https://headlessui.dev/) - A set of completely unstyled, fully accessible UI components, designed to integrate beautifully with Tailwind CSS.
+- [Fabric.js](http://fabricjs.com/) - A powerful and flexible open-source JavaScript HTML5 canvas library for working with rich media.
+- [React Colorful](https://omgovich.github.io/react-colorful/) - A tiny yet powerful color picker component for React.
+- [PostCSS](https://postcss.org/) - A tool for transforming CSS with JavaScript.
+
+## **💿How to Run Locally**
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/mi1sh/add-some-text.git
+```
+
+2. Navigate to the project directory:
+
+```bash
+cd add-some-text
+```
+
+3. Install dependencies:
+
+```bash
+npm install
+```
+
+4. Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open your browser and navigate to `http://localhost:3000` to view the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## **©️License**
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
